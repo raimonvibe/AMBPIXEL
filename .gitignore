@@ -1,0 +1,8 @@
+node_modules
+.next
+out
+.env*.local
+*.tsbuildinfo
+
+# Reference screenshots at repo root (assets live under public/)
+/*.jpg
