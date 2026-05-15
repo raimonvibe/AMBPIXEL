@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Moon, Sun } from "lucide-react";
 
@@ -16,6 +17,16 @@ const skills = [
   { name: "Motion Graphics", level: "95%" },
   { name: "UGC AI Ads", level: "96%" },
   { name: "Creative Direction", level: "94%" },
+  { name: "Storytelling", level: "93%" },
+];
+
+const tools = [
+  "HeyGen Pro",
+  "Veo 3",
+  "Google Flow",
+  "CapCut",
+  "Grok",
+  "AI Motion Tools",
 ];
 
 const testimonials = [
@@ -32,6 +43,8 @@ const testimonials = [
     text: "Engagement increased massively after working with Ambpixel.",
   },
 ];
+
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaqvgvvn";
 
 const portfolioItems = [
   { title: "Brand & UGC Ads", src: "/videos/ads.mp4", type: "video/mp4" },
@@ -53,6 +66,42 @@ export default function Home() {
   const [active, setActive] = useState("Portfolio");
   const [menuOpen, setMenuOpen] = useState(false);
   const [dark, setDark] = useState(true);
+  const [themeReady, setThemeReady] = useState(false);
+  const [formStatus, setFormStatus] = useState<
+    "idle" | "sending" | "success" | "error"
+  >("idle");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "light") setDark(false);
+    if (saved === "dark") setDark(true);
+    setThemeReady(true);
+  }, []);
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setFormStatus("sending");
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        body: formData,
+        headers: { Accept: "application/json" },
+      });
+
+      if (response.ok) {
+        setFormStatus("success");
+        form.reset();
+      } else {
+        setFormStatus("error");
+      }
+    } catch {
+      setFormStatus("error");
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,12 +114,42 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!themeReady) return;
     if (dark) {
       document.body.classList.remove("light");
+      localStorage.setItem("theme", "dark");
     } else {
       document.body.classList.add("light");
+      localStorage.setItem("theme", "light");
     }
-  }, [dark]);
+  }, [dark, themeReady]);
+
+  useEffect(() => {
+    const sectionIds = navItems.map((item) => item.href.slice(1));
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) {
+          const match = navItems.find(
+            (item) => item.href === `#${visible[0].target.id}`,
+          );
+          if (match) setActive(match.name);
+        }
+      },
+      { rootMargin: "-35% 0px -50% 0px", threshold: [0, 0.25, 0.5] },
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
@@ -81,21 +160,29 @@ export default function Home() {
     return () => mq.removeEventListener("change", closeOnDesktop);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   return (
     <main>
       {/* NAVBAR */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 left-0 z-50 w-full transition-all duration-500 ${
-          scrolled ? "glass border-b border-white/10" : "bg-transparent"
+        className={`fixed top-0 left-0 isolate z-[200] w-full transition-all duration-500 ${
+          scrolled ? "glass border-b" : "nav-at-top bg-transparent"
         }`}
+        style={scrolled ? { borderColor: "var(--nav-border)" } : undefined}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-16">
+        <div className="relative z-[201] mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-16">
           <a
             href="#home"
             onClick={() => setMenuOpen(false)}
-            className="text-2xl font-black tracking-[0.3em]"
+            className="relative z-[202] text-2xl font-black tracking-[0.3em] touch-manipulation"
           >
             AMBPIXEL
           </a>
@@ -106,7 +193,7 @@ export default function Home() {
                 key={item.name}
                 href={item.href}
                 onClick={() => setActive(item.name)}
-                className="relative text-sm uppercase tracking-[0.25em] text-white/70 transition hover:text-white"
+                className="nav-link relative text-sm uppercase tracking-[0.25em]"
               >
                 {item.name}
 
@@ -120,16 +207,20 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="relative z-[202] flex items-center gap-3">
             <button
+              type="button"
+              aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
               onClick={() => setDark(!dark)}
-              className="glass rounded-full p-3"
+              className={`nav-icon-btn flex h-11 w-11 shrink-0 cursor-pointer touch-manipulation items-center justify-center rounded-full ${scrolled ? "glass" : ""}`}
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
             <a
               href="https://wa.me/2348069802450"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hidden rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-black md:block"
             >
               WhatsApp
@@ -140,7 +231,7 @@ export default function Home() {
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex md:hidden"
+              className={`nav-icon-btn flex h-11 w-11 shrink-0 cursor-pointer touch-manipulation items-center justify-center rounded-full md:hidden ${scrolled ? "glass" : ""}`}
             >
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -151,12 +242,17 @@ export default function Home() {
         <AnimatePresence>
           {menuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
-              className="glass border-t border-white/10 md:hidden"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="relative z-[201] overflow-hidden border-t md:hidden"
+              style={{
+                background: "var(--glass-bg)",
+                borderColor: "var(--nav-border)",
+              }}
             >
-              <div className="flex flex-col gap-6 p-6">
+              <div className="flex flex-col gap-2 p-4 pb-6">
                 {navItems.map((item) => (
                   <a
                     key={item.name}
@@ -165,7 +261,7 @@ export default function Home() {
                       setActive(item.name);
                       setMenuOpen(false);
                     }}
-                    className="text-lg uppercase tracking-[0.2em]"
+                    className="nav-link mobile-nav-item flex min-h-[48px] cursor-pointer touch-manipulation items-center rounded-xl px-4 text-lg uppercase tracking-[0.2em]"
                   >
                     {item.name}
                   </a>
@@ -173,7 +269,10 @@ export default function Home() {
 
                 <a
                   href="https://wa.me/2348069802450"
-                  className="rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-4 text-center font-bold text-black"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                  className="mt-2 flex min-h-[48px] cursor-pointer touch-manipulation items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-4 text-center font-bold text-black active:opacity-90"
                 >
                   WhatsApp
                 </a>
@@ -186,7 +285,7 @@ export default function Home() {
       {/* HERO */}
       <section
         id="home"
-        className="relative flex min-h-screen items-center overflow-hidden"
+        className="on-dark relative flex min-h-screen items-center overflow-hidden"
       >
         <video
           autoPlay
@@ -232,7 +331,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="mt-8 max-w-2xl text-lg leading-relaxed text-gray-300 md:text-xl"
+              className="text-muted mt-8 max-w-2xl text-lg leading-relaxed md:text-xl"
             >
               AI commercials, UGC ads, motion graphics, AI influencers,
               explainer videos and futuristic storytelling for brands that
@@ -262,14 +361,18 @@ export default function Home() {
               duration: 5,
               repeat: Infinity,
             }}
-            className="relative mx-auto md:mx-0"
+            className="relative mx-auto w-full max-w-[320px] shrink-0 md:mx-0 md:max-w-[520px] lg:max-w-[600px] xl:max-w-[680px]"
           >
             <div className="absolute -inset-5 rounded-[40px] bg-gradient-to-r from-cyan-500 to-purple-600 opacity-30 blur-3xl" />
 
-            <img
+            <Image
               src="/images/founder/founder.jpg"
-              alt="Founder"
-              className="relative z-10 h-[420px] w-[320px] rounded-[40px] object-cover md:h-[620px] md:w-[450px]"
+              alt="Founder of Ambpixel"
+              width={680}
+              height={760}
+              priority
+              sizes="(max-width: 768px) 320px, (max-width: 1024px) 520px, 680px"
+              className="relative z-10 h-[420px] w-full rounded-[40px] object-cover md:h-[min(72vh,640px)] lg:h-[min(75vh,700px)] xl:h-[min(78vh,760px)]"
             />
           </motion.div>
         </div>
@@ -294,18 +397,23 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="space-y-6 text-lg text-gray-300">
+          <div className="text-muted space-y-6 text-lg">
             <p>
               Ambpixel is a cinematic AI creative studio blending motion
-              graphics, generative video, AI influencers and visual
+              graphics, generative video, AI influencers, and visual
               storytelling into premium brand experiences.
+            </p>
+
+            <p>
+              From UGC-style commercials to futuristic AI campaigns, every
+              visual is crafted to make brands impossible to ignore.
             </p>
 
             <div className="grid grid-cols-2 gap-6 pt-8">
               <div className="glass rounded-3xl p-6">
                 <h3 className="text-4xl font-black text-cyan-400">10+</h3>
 
-                <p className="mt-2 text-gray-400">Brands Worked With</p>
+                <p className="text-subtle mt-2">Brands Worked With</p>
               </div>
 
               <div className="glass rounded-3xl p-6">
@@ -313,7 +421,7 @@ export default function Home() {
                   100+
                 </h3>
 
-                <p className="mt-2 text-gray-400">AI Projects Created</p>
+                <p className="text-subtle mt-2">AI Projects Created</p>
               </div>
             </div>
           </div>
@@ -332,19 +440,30 @@ export default function Home() {
         <h2 className="mb-16 text-5xl font-black">Creative AI Expertise</h2>
 
         <div className="space-y-8">
-          {skills.map((skill, index) => (
-            <div key={index}>
+          {skills.map((skill) => (
+            <div key={skill.name}>
               <div className="mb-2 flex justify-between">
                 <p>{skill.name}</p>
                 <p>{skill.level}</p>
               </div>
 
-              <div className="h-3 overflow-hidden rounded-full bg-white/10">
+              <div className="theme-track h-3 overflow-hidden rounded-full">
                 <div
                   style={{ width: skill.level }}
                   className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-purple-500"
                 />
               </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-20 grid gap-6 md:grid-cols-3">
+          {tools.map((tool) => (
+            <div
+              key={tool}
+              className="glass rounded-3xl p-8 text-center text-xl font-semibold"
+            >
+              {tool}
             </div>
           ))}
         </div>
@@ -372,6 +491,7 @@ export default function Home() {
                 autoPlay
                 loop
                 playsInline
+                preload="metadata"
                 className="h-[400px] w-full object-cover transition duration-500 group-hover:scale-110"
               >
                 <source src={src} type={type} />
@@ -380,7 +500,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
 
               <div className="absolute bottom-8 left-8">
-                <h3 className="text-3xl font-black">{title}</h3>
+                <h3 className="text-3xl font-black text-white">{title}</h3>
               </div>
             </div>
           ))}
@@ -396,9 +516,9 @@ export default function Home() {
         <h2 className="mb-16 text-5xl font-black">What Clients Say</h2>
 
         <div className="grid gap-8 md:grid-cols-3">
-          {testimonials.map((item, index) => (
-            <div key={index} className="glass rounded-[40px] p-10">
-              <p className="text-gray-300">“{item.text}”</p>
+          {testimonials.map((item) => (
+            <div key={item.name} className="glass rounded-[40px] p-10">
+              <p className="text-muted">“{item.text}”</p>
 
               <h3 className="mt-8 text-xl font-bold">{item.name}</h3>
             </div>
@@ -407,40 +527,80 @@ export default function Home() {
       </section>
 
       {/* CONTACT */}
-      <section id="contact" className="mx-auto max-w-4xl px-6 py-32">
-        <div className="glass rounded-[40px] p-10 md:p-16">
+      <section
+        id="contact"
+        className="mx-auto max-w-4xl overflow-x-hidden px-4 py-32 sm:px-6"
+      >
+        <div className="glass min-w-0 overflow-hidden rounded-[40px] p-6 sm:p-10 md:p-16">
           <p className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-400">
             Contact
           </p>
 
-          <h2 className="text-5xl font-black">
-            Let’s Build Something
-            <span className="gradient-text block">Cinematic.</span>
+          <h2 className="max-w-full break-words text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
+            Let&apos;s Build Something{" "}
+            <span className="gradient-text">Cinematic.</span>
           </h2>
 
-          <form className="mt-12 space-y-6">
+          <form className="mt-12 space-y-6" onSubmit={handleSubmit}>
             <input
               type="text"
+              name="name"
+              required
               placeholder="Your Name"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 p-5 outline-none"
+              className="theme-input"
             />
 
             <input
               type="email"
+              name="email"
+              required
               placeholder="Your Email"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 p-5 outline-none"
+              className="theme-input"
             />
 
             <textarea
+              name="message"
+              required
               rows={6}
               placeholder="Tell me about your project"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 p-5 outline-none"
+              className="theme-input resize-y"
             />
 
-            <button className="glow rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-10 py-5 font-bold text-black">
-              Submit Project
+            <button
+              type="submit"
+              disabled={formStatus === "sending"}
+              className="glow rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-10 py-5 font-bold text-black disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {formStatus === "sending" ? "Sending…" : "Submit Project"}
             </button>
+
+            {formStatus === "success" && (
+              <p className="form-status-success" role="status">
+                Thanks — your message was sent. We&apos;ll be in touch soon.
+              </p>
+            )}
+
+            {formStatus === "error" && (
+              <p className="form-status-error" role="alert">
+                Something went wrong. Please try again or reach out on WhatsApp.
+              </p>
+            )}
           </form>
+
+          <div className="mt-12 flex flex-wrap gap-4">
+            <a
+              href="https://wa.me/2348069802450"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="theme-outline-btn"
+            >
+              WhatsApp
+            </a>
+
+            <a href="mailto:chikaugwu0121@gmail.com" className="theme-outline-btn">
+              Email
+            </a>
+          </div>
         </div>
       </section>
     </main>

@@ -6,14 +6,32 @@
 
 :root {
   --bg: #050505;
-  --text: #ffffff;
+  --text: #f8fafc;
+  --text-muted: #cbd5e1;
+  --text-subtle: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --track-bg: rgba(255, 255, 255, 0.1);
+  --nav-border: rgba(255, 255, 255, 0.1);
+  --noise-opacity: 0.03;
   --cyan: #00d1ff;
   --purple: #7c3aed;
 }
 
 .light {
-  --bg: #ffffff;
-  --text: #050505;
+  --bg: #eef2f7;
+  --text: #1e293b;
+  --text-muted: #475569;
+  --text-subtle: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.92);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --input-bg: #ffffff;
+  --input-border: rgba(15, 23, 42, 0.12);
+  --track-bg: rgba(15, 23, 42, 0.08);
+  --nav-border: rgba(15, 23, 42, 0.1);
+  --noise-opacity: 0.012;
 }
 
 * {
@@ -31,19 +49,151 @@ body {
   color: var(--text);
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
-  transition: 0.4s ease;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-subtle {
+  color: var(--text-subtle);
+}
+
+.nav-link {
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+
+/* Navbar over dark hero video (before scroll) */
+.nav-at-top,
+.nav-at-top .nav-link {
+  color: #f8fafc;
+}
+
+.nav-at-top .nav-link {
+  opacity: 0.85;
+}
+
+.nav-at-top .nav-link:hover {
+  color: #ffffff;
+  opacity: 1;
+}
+
+.nav-at-top .nav-icon-btn {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mobile-nav-item:active {
+  background: var(--track-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.theme-input {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+  padding: 1.25rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.theme-input::placeholder {
+  color: var(--text-subtle);
+}
+
+.theme-input:focus {
+  border-color: rgba(0, 209, 255, 0.45);
+  box-shadow: 0 0 0 3px rgba(0, 209, 255, 0.12);
+}
+
+.light .theme-input {
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.theme-outline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+  padding: 1rem 2rem;
+  font-weight: 500;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.theme-outline-btn:hover {
+  background: var(--track-bg);
+  border-color: rgba(0, 209, 255, 0.35);
+}
+
+.form-status-success {
+  color: #0891b2;
+}
+
+.light .form-status-success {
+  color: #0e7490;
+}
+
+.form-status-error {
+  color: #f87171;
+}
+
+.light .form-status-error {
+  color: #dc2626;
+}
+
+.theme-track {
+  background: var(--track-bg);
+}
+
+.on-dark {
+  --text: #f8fafc;
+  --text-muted: #e2e8f0;
+  --text-subtle: #cbd5e1;
+  color: var(--text);
 }
 
 .gradient-text {
-  background: linear-gradient(to right, #00D1FF, #7C3AED);
+  background: linear-gradient(to right, #00d1ff, #7c3aed);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  transition:
+    background-color 0.4s ease,
+    border-color 0.4s ease;
 }
 
 .glow {
@@ -52,12 +202,18 @@ body {
     0 0 60px rgba(124, 58, 237, 0.25);
 }
 
+.light .glow {
+  box-shadow:
+    0 4px 20px rgba(0, 209, 255, 0.2),
+    0 8px 32px rgba(124, 58, 237, 0.12);
+}
+
 .noise {
   position: fixed;
   inset: 0;
-  opacity: 0.03;
+  opacity: var(--noise-opacity);
   pointer-events: none;
-  z-index: 999;
+  z-index: 1;
   background-image: url('https://grainy-gradients.vercel.app/noise.svg');
 }
 
@@ -66,7 +222,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(#00D1FF, #7C3AED);
+  background: linear-gradient(#00d1ff, #7c3aed);
   border-radius: 20px;
 }
 

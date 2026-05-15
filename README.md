@@ -11,6 +11,7 @@ Cinematic AI creative studio portfolio: hero video, about, skills, portfolio gri
 - [Next.js](https://nextjs.org/) (App Router)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Framer Motion](https://www.framer.com/motion/)
+- [Lucide React](https://lucide.dev/) (icons)
 
 ## Local development
 
@@ -23,18 +24,22 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Media assets
 
-Add your own files under `public/`:
+Files under `public/`:
 
 | Path | Purpose |
 |------|---------|
-| `public/videos/hero.mp4` | Hero background |
-| `public/videos/<category>/sample.mp4` | Portfolio tiles (e.g. `ugc-videos`, `fintech-commercials`) |
-| `public/images/founder/founder.jpg` | Founder image (hero + branding) |
+| `public/videos/ads.mp4` | Hero background |
+| `public/videos/trader.mp4` | Portfolio — Fintech & Trading |
+| `public/videos/elite-exams.mp4` | Portfolio — Education Explainers |
+| `public/videos/disease-prevention.mov` | Portfolio — Health & Prevention |
+| `public/images/founder/founder.jpg` | Founder image (hero) |
+
+Compress large videos before deploy for faster loads (especially `elite-exams.mp4`).
 
 ## Deploy
 
-The live deployment is on [Vercel](https://vercel.com/) at [https://ambpixel.vercel.app/](https://ambpixel.vercel.app/). Connect this repo in the Vercel dashboard to redeploy on push.
+Connect this repo on [Vercel](https://vercel.com/) to redeploy on push to `main`.
 
 ## License
 
-[MIT](LICENSE) — see `LICENSE` for full text.
+[MIT](LICENSE)
