@@ -1,15 +1,25 @@
-const categories = [
-  "UGC Videos",
-  "Fintech Commercials",
-  "AI Movies",
-  "Explainer Videos",
-  "Animations",
-  "Brand Commercials",
+const portfolioItems: { title: string; src: string; type: string }[] = [
+  {
+    title: "Brand & UGC Ads",
+    src: "/videos/ads.mp4",
+    type: "video/mp4",
+  },
+  {
+    title: "Fintech & Trading",
+    src: "/videos/trader.mp4",
+    type: "video/mp4",
+  },
+  {
+    title: "Education Explainers",
+    src: "/videos/elite-exams.mp4",
+    type: "video/mp4",
+  },
+  {
+    title: "Health & Prevention",
+    src: "/videos/disease-prevention.mov",
+    type: "video/quicktime",
+  },
 ];
-
-function categoryToPath(category: string) {
-  return `/videos/${category.toLowerCase().replace(/\s/g, "-")}/sample.mp4`;
-}
 
 export default function Portfolio() {
   return (
@@ -21,9 +31,9 @@ export default function Portfolio() {
       <h2 className="mb-16 text-5xl font-black">Featured AI Productions</h2>
 
       <div className="grid gap-8 md:grid-cols-2">
-        {categories.map((category) => (
+        {portfolioItems.map(({ title, src, type }) => (
           <div
-            key={category}
+            key={title}
             className="group relative overflow-hidden rounded-[40px]"
           >
             <video
@@ -33,13 +43,13 @@ export default function Portfolio() {
               playsInline
               className="h-[400px] w-full object-cover transition duration-500 group-hover:scale-110"
             >
-              <source src={categoryToPath(category)} type="video/mp4" />
+              <source src={src} type={type} />
             </video>
 
             <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
 
             <div className="absolute bottom-8 left-8">
-              <h3 className="text-3xl font-black">{category}</h3>
+              <h3 className="text-3xl font-black">{title}</h3>
             </div>
           </div>
         ))}

@@ -12,7 +12,7 @@ export default function Hero() {
         playsInline
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src="/videos/hero.mp4" type="video/mp4" />
+        <source src="/videos/ads.mp4" type="video/mp4" />
       </video>
 
       <div className="hero-overlay absolute inset-0" />
