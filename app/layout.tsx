@@ -1,20 +1,19 @@
-import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Ambpixel",
-  description: "AI Creative Studio",
+  description: "Cinematic AI Creative Studio",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body>
-        <div className="noise" aria-hidden />
+        <div className="noise" />
         {children}
       </body>
     </html>
