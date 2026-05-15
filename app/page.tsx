@@ -33,13 +33,19 @@ const testimonials = [
   },
 ];
 
-const categories = [
-  "ugc-videos",
-  "fintech-commercials",
-  "ai-movies",
-  "explainer-videos",
-  "animations",
-  "brand-commercials",
+const portfolioItems = [
+  { title: "Brand & UGC Ads", src: "/videos/ads.mp4", type: "video/mp4" },
+  { title: "Fintech & Trading", src: "/videos/trader.mp4", type: "video/mp4" },
+  {
+    title: "Education Explainers",
+    src: "/videos/elite-exams.mp4",
+    type: "video/mp4",
+  },
+  {
+    title: "Health & Prevention",
+    src: "/videos/disease-prevention.mov",
+    type: "video/quicktime",
+  },
 ];
 
 export default function Home() {
@@ -66,6 +72,15 @@ export default function Home() {
     }
   }, [dark]);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const closeOnDesktop = () => {
+      if (mq.matches) setMenuOpen(false);
+    };
+    mq.addEventListener("change", closeOnDesktop);
+    return () => mq.removeEventListener("change", closeOnDesktop);
+  }, []);
+
   return (
     <main>
       {/* NAVBAR */}
@@ -79,6 +94,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-16">
           <a
             href="#home"
+            onClick={() => setMenuOpen(false)}
             className="text-2xl font-black tracking-[0.3em]"
           >
             AMBPIXEL
@@ -120,10 +136,13 @@ export default function Home() {
             </a>
 
             <button
+              type="button"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden"
+              className="flex md:hidden"
             >
-              {menuOpen ? <X /> : <Menu />}
+              {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -176,7 +195,7 @@ export default function Home() {
           playsInline
           className="absolute inset-0 h-full w-full scale-110 object-cover"
         >
-          <source src="/videos/hero.mp4" type="video/mp4" />
+          <source src="/videos/ads.mp4" type="video/mp4" />
         </video>
 
         <div className="absolute inset-0 bg-black/65" />
@@ -221,13 +240,19 @@ export default function Home() {
             </motion.p>
 
             <div className="mt-12 flex flex-wrap gap-5">
-              <button className="glow rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-10 py-5 text-lg font-bold text-black transition hover:scale-105">
+              <a
+                href="#portfolio"
+                className="glow rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-10 py-5 text-lg font-bold text-black transition hover:scale-105"
+              >
                 View Projects
-              </button>
+              </a>
 
-              <button className="glass rounded-full px-10 py-5 text-lg">
+              <a
+                href="#contact"
+                className="glass rounded-full px-10 py-5 text-lg"
+              >
                 Start A Project
-              </button>
+              </a>
             </div>
           </div>
 
@@ -337,9 +362,9 @@ export default function Home() {
         <h2 className="mb-16 text-5xl font-black">Featured Productions</h2>
 
         <div className="grid gap-8 md:grid-cols-2">
-          {categories.map((category, index) => (
+          {portfolioItems.map(({ title, src, type }) => (
             <div
-              key={index}
+              key={title}
               className="group relative overflow-hidden rounded-[40px]"
             >
               <video
@@ -349,18 +374,13 @@ export default function Home() {
                 playsInline
                 className="h-[400px] w-full object-cover transition duration-500 group-hover:scale-110"
               >
-                <source
-                  src={`/videos/${category}/sample.mp4`}
-                  type="video/mp4"
-                />
+                <source src={src} type={type} />
               </video>
 
               <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
 
               <div className="absolute bottom-8 left-8">
-                <h3 className="text-3xl font-black capitalize">
-                  {category.replace(/-/g, " ")}
-                </h3>
+                <h3 className="text-3xl font-black">{title}</h3>
               </div>
             </div>
           ))}
