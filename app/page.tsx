@@ -381,23 +381,23 @@ export default function Home() {
       {/* ABOUT */}
       <section
         id="about"
-        className="mx-auto max-w-7xl px-6 py-32 md:px-16"
+        className="mx-auto max-w-7xl overflow-x-hidden px-6 py-32 md:px-16"
       >
-        <div className="grid gap-20 md:grid-cols-2">
-          <div>
+        <div className="grid w-full gap-12 md:grid-cols-2 md:gap-20">
+          <div className="min-w-0 w-full">
             <p className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-400">
               About Ambpixel
             </p>
 
-            <h2 className="text-5xl font-black leading-tight">
+            <h2 className="max-w-full text-balance text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl">
               Building The Future
-              <span className="gradient-text block">
+              <span className="gradient-text mt-1 block sm:mt-2">
                 Of AI Storytelling.
               </span>
             </h2>
           </div>
 
-          <div className="text-muted space-y-6 text-lg">
+          <div className="text-muted min-w-0 w-full space-y-6 text-lg">
             <p>
               Ambpixel is a cinematic AI creative studio blending motion
               graphics, generative video, AI influencers, and visual
@@ -409,19 +409,23 @@ export default function Home() {
               visual is crafted to make brands impossible to ignore.
             </p>
 
-            <div className="grid grid-cols-2 gap-6 pt-8">
-              <div className="glass rounded-3xl p-6">
-                <h3 className="text-4xl font-black text-cyan-400">10+</h3>
-
-                <p className="text-subtle mt-2">Brands Worked With</p>
+            <div className="grid w-full grid-cols-2 gap-3 pt-8 sm:gap-6">
+              <div className="glass min-w-0 rounded-2xl p-4 sm:rounded-3xl sm:p-6">
+                <h3 className="text-3xl font-black text-cyan-400 sm:text-4xl">
+                  10+
+                </h3>
+                <p className="text-subtle mt-2 text-sm leading-snug sm:text-base">
+                  Brands Worked With
+                </p>
               </div>
 
-              <div className="glass rounded-3xl p-6">
-                <h3 className="text-4xl font-black text-purple-400">
+              <div className="glass min-w-0 rounded-2xl p-4 sm:rounded-3xl sm:p-6">
+                <h3 className="text-3xl font-black text-purple-400 sm:text-4xl">
                   100+
                 </h3>
-
-                <p className="text-subtle mt-2">AI Projects Created</p>
+                <p className="text-subtle mt-2 text-sm leading-snug sm:text-base">
+                  AI Projects Created
+                </p>
               </div>
             </div>
           </div>
