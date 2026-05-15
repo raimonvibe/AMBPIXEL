@@ -96,6 +96,16 @@ body {
   background: var(--track-bg);
 }
 
+.mobile-menu-panel {
+  background: var(--bg);
+  border-top: 1px solid var(--nav-border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.light .mobile-menu-panel {
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -193,7 +203,31 @@ body {
   border: 1px solid var(--glass-border);
   transition:
     background-color 0.4s ease,
-    border-color 0.4s ease;
+    border-color 0.4s ease,
+    color 0.4s ease;
+}
+
+/* Glass buttons/links: readable text on light glass surfaces */
+a.glass,
+button.glass,
+.glass-btn {
+  color: var(--text);
+}
+
+.on-dark a.glass,
+.on-dark button.glass,
+.on-dark .glass-btn {
+  color: #f8fafc;
+}
+
+.light .on-dark a.glass,
+.light .on-dark button.glass,
+.light .on-dark .glass-btn {
+  color: #1e293b;
+}
+
+.light .nav-icon-btn.glass {
+  color: var(--text);
 }
 
 .glow {

@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Moon, Sun } from "lucide-react";
+import LazyVideo from "@/components/LazyVideo";
 
 const navItems = [
   { name: "Portfolio", href: "#portfolio" },
@@ -167,6 +168,13 @@ export default function Home() {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnScroll = () => setMenuOpen(false);
+    window.addEventListener("scroll", closeOnScroll, { passive: true });
+    return () => window.removeEventListener("scroll", closeOnScroll);
+  }, [menuOpen]);
+
   return (
     <main>
       {/* NAVBAR */}
@@ -174,9 +182,15 @@ export default function Home() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 isolate z-[200] w-full transition-all duration-500 ${
-          scrolled ? "glass border-b" : "nav-at-top bg-transparent"
+          menuOpen || scrolled
+            ? "glass border-b"
+            : "nav-at-top bg-transparent"
         }`}
-        style={scrolled ? { borderColor: "var(--nav-border)" } : undefined}
+        style={
+          menuOpen || scrolled
+            ? { borderColor: "var(--nav-border)" }
+            : undefined
+        }
       >
         <div className="relative z-[201] mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-16">
           <a
@@ -212,7 +226,7 @@ export default function Home() {
               type="button"
               aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
               onClick={() => setDark(!dark)}
-              className={`nav-icon-btn flex h-11 w-11 shrink-0 cursor-pointer touch-manipulation items-center justify-center rounded-full ${scrolled ? "glass" : ""}`}
+              className={`nav-icon-btn flex h-11 w-11 shrink-0 cursor-pointer touch-manipulation items-center justify-center rounded-full ${menuOpen || scrolled ? "glass" : ""}`}
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
@@ -231,28 +245,38 @@ export default function Home() {
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen(!menuOpen)}
-              className={`nav-icon-btn flex h-11 w-11 shrink-0 cursor-pointer touch-manipulation items-center justify-center rounded-full md:hidden ${scrolled ? "glass" : ""}`}
+              className={`nav-icon-btn flex h-11 w-11 shrink-0 cursor-pointer touch-manipulation items-center justify-center rounded-full md:hidden ${menuOpen || scrolled ? "glass" : ""}`}
             >
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
-        {/* MOBILE MENU */}
-        <AnimatePresence>
-          {menuOpen && (
+      </motion.nav>
+
+      {/* MOBILE MENU — full-screen overlay */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Close menu"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMenuOpen(false)}
+              className="fixed inset-0 z-[198] bg-black/75 backdrop-blur-md md:hidden"
+            />
+
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25 }}
-              className="relative z-[201] overflow-hidden border-t md:hidden"
-              style={{
-                background: "var(--glass-bg)",
-                borderColor: "var(--nav-border)",
-              }}
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="mobile-menu-panel fixed inset-x-0 bottom-0 top-[4.5rem] z-[201] overflow-y-auto md:hidden"
             >
-              <div className="flex flex-col gap-2 p-4 pb-6">
+              <nav className="flex flex-col gap-2 p-6 pb-10">
                 {navItems.map((item) => (
                   <a
                     key={item.name}
@@ -261,7 +285,7 @@ export default function Home() {
                       setActive(item.name);
                       setMenuOpen(false);
                     }}
-                    className="nav-link mobile-nav-item flex min-h-[48px] cursor-pointer touch-manipulation items-center rounded-xl px-4 text-lg uppercase tracking-[0.2em]"
+                    className="nav-link mobile-nav-item flex min-h-[52px] cursor-pointer touch-manipulation items-center rounded-xl px-4 text-lg font-medium uppercase tracking-[0.2em]"
                   >
                     {item.name}
                   </a>
@@ -272,30 +296,27 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMenuOpen(false)}
-                  className="mt-2 flex min-h-[48px] cursor-pointer touch-manipulation items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-4 text-center font-bold text-black active:opacity-90"
+                  className="mt-4 flex min-h-[52px] cursor-pointer touch-manipulation items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-4 text-center font-bold text-black active:opacity-90"
                 >
                   WhatsApp
                 </a>
-              </div>
+              </nav>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.nav>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* HERO */}
       <section
         id="home"
         className="on-dark relative flex min-h-screen items-center overflow-hidden"
       >
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
+        <LazyVideo
+          src="/videos/ads.mp4"
+          type="video/mp4"
+          priority
           className="absolute inset-0 h-full w-full scale-110 object-cover"
-        >
-          <source src="/videos/ads.mp4" type="video/mp4" />
-        </video>
+        />
 
         <div className="absolute inset-0 bg-black/65" />
 
@@ -348,7 +369,7 @@ export default function Home() {
 
               <a
                 href="#contact"
-                className="glass rounded-full px-10 py-5 text-lg"
+                className="glass glass-btn rounded-full px-10 py-5 text-lg font-semibold"
               >
                 Start A Project
               </a>
@@ -494,16 +515,11 @@ export default function Home() {
               key={title}
               className="group relative overflow-hidden rounded-[40px]"
             >
-              <video
-                muted
-                autoPlay
-                loop
-                playsInline
-                preload="metadata"
+              <LazyVideo
+                src={src}
+                type={type}
                 className="h-[400px] w-full object-cover transition duration-500 group-hover:scale-110"
-              >
-                <source src={src} type={type} />
-              </video>
+              />
 
               <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
 
