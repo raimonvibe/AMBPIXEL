@@ -476,13 +476,17 @@ export default function Home() {
       {/* PORTFOLIO */}
       <section
         id="portfolio"
-        className="mx-auto max-w-7xl px-6 py-32 md:px-16"
+        className="mx-auto max-w-7xl overflow-x-hidden px-6 py-32 md:px-16"
       >
-        <p className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-400">
-          Portfolio
-        </p>
+        <div className="min-w-0 w-full">
+          <p className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-400">
+            Portfolio
+          </p>
 
-        <h2 className="mb-16 text-5xl font-black">Featured Productions</h2>
+          <h2 className="mb-16 max-w-full text-balance text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl">
+            Featured Productions
+          </h2>
+        </div>
 
         <div className="grid gap-8 md:grid-cols-2">
           {portfolioItems.map(({ title, src, type }) => (
